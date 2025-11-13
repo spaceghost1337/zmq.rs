@@ -108,6 +108,10 @@ impl MultiPeerBackend for SubSocketBackend {
     }
 
     fn peer_disconnected(&self, peer_id: &PeerIdentity) {
+        log::info!("Client disconnected {:?}", peer_id);
+        if let Some(monitor) = self.monitor().lock().as_mut() {
+            let _ = monitor.try_send(SocketEvent::Disconnected(peer_id.clone()));
+        }
         self.peers.remove(peer_id);
     }
 }
